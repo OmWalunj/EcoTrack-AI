@@ -110,3 +110,25 @@ Passed
 * Cloud synchronization
 * Community sustainability challenges
 * Integration with external environmental APIs
+
+## Application Screenshots
+
+### Dashboard
+
+<img width="1900" height="917" alt="Dashboard" src="https://github.com/user-attachments/assets/25a5692d-9e0b-4c18-b24f-45798769f9ae" />
+
+### Carbon Footprint Result
+
+<img width="1902" height="900" alt="Carbon Calculator" src="https://github.com/user-attachments/assets/0853da7b-c618-4828-928b-139e18098e30" />
+
+### Personalized Recommendations
+
+<img width="1907" height="922" alt="AI Assistant" src="https://github.com/user-attachments/assets/be66fdb0-79a0-4725-bfcb-d6499eb85faf" />
+
+### AI Object Vision
+
+<img width="1897" height="905" alt="AI object vision" src="https://github.com/user-attachments/assets/4749bc62-a5da-4f8d-a283-82f2ccf2205a" />
+
+### Progress History
+
+<img width="1897" height="911" alt="Track Logs" src="https://github.com/user-attachments/assets/577b74bf-0dc7-4876-be50-6afc57becda5" />
