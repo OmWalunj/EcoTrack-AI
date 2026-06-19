@@ -51,6 +51,50 @@ Additional engagement features such as Green Points, Achievement Badges, Weekly 
 * Progress Tracking Dashboard
 * Responsive User Interface
 
+## Testing
+
+### Test Case 1
+
+Input:
+
+* Travel: Walking
+* Food: Vegetarian
+* Flights: 0
+
+Expected Result:
+Low Carbon Impact
+
+Status:
+Passed
+
+### Test Case 2
+
+Input:
+
+* Travel: Car
+* High Electricity Usage
+* Flights: 5
+
+Expected Result:
+High Carbon Impact
+
+Status:
+Passed
+
+### Test Case 3
+
+Input:
+
+* Travel: Bus
+* Moderate Electricity Usage
+* Flights: 1
+
+Expected Result:
+Medium Carbon Impact
+
+Status:
+Passed
+
 ## Assumptions Made
 
 * Carbon emission values are estimated and simplified for demonstration purposes.
