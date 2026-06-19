@@ -35,14 +35,14 @@ let categoryChartRef = null;
 window.addEventListener('DOMContentLoaded', () => {
     loadStateFromLocalStorage();
     applyThemeDefaults();
-    initializeFormInputListeners();
-    refreshApplicationInterfaceMetricsUI();
+    initFormListeners();
+    refreshUI();
 });
 
 // REFRESH INTERFACE LIFECYCLE MAIN DISPATCHER
-function refreshApplicationInterfaceMetricsUI() {
+function refreshUI() {
     renderKPIWidgets();
-    renderChartsTelemetry();
+    renderCharts();
     renderLogsTable();
     renderAchievementsGrid();
     updateGamificationDisplays();
@@ -113,7 +113,7 @@ function toggleDarkMode() {
     }
     saveStateToLocalStorage();
     showToastNotification("Theme context style adjusted successfully!", "info");
-    renderChartsTelemetry(); // Redraw chart matching theme colors
+    renderCharts(); // Redraw chart matching theme colors
 }
 
 // SECTION SWITCHER ROUTING CONTROLLER
@@ -135,7 +135,7 @@ function switchSection(sectionId) {
 }
 
 // REAL-TIME MATHEMATICAL FORMULATION MATRIX CALCULATION PIPELINE ENGINE
-function calculateCarbonEquivalentMetric(trans, electric, water, waste, dietKey) {
+function calculateCarbon(trans, electric, water, waste, dietKey) {
     let carbonNetVal = 0;
     carbonNetVal += (parseFloat(trans) || 0) * CARBON_FACTORS.transport;
     carbonNetVal += (parseFloat(electric) || 0) * CARBON_FACTORS.electricity;
@@ -146,25 +146,25 @@ function calculateCarbonEquivalentMetric(trans, electric, water, waste, dietKey)
 }
 
 // LIVE FEEDBACK ON KEY INPUT LOOPS FORM LISTENER BINDINGS SETUP INITIALIZER
-function initializeFormInputListeners() {
+function initFormListeners() {
     const inputs = ['calc-trans', 'calc-electric', 'calc-water', 'calc-waste', 'calc-diet'];
     inputs.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener('input', runLiveRealTimeCalculatorEnginePreview);
+            element.addEventListener('input', updateLivePreview);
         }
     });
-    runLiveRealTimeCalculatorEnginePreview();
+    updateLivePreview();
 }
 
-function runLiveRealTimeCalculatorEnginePreview() {
+function updateLivePreview() {
     const trans = document.getElementById('calc-trans').value;
     const electric = document.getElementById('calc-electric').value;
     const water = document.getElementById('calc-water').value;
     const waste = document.getElementById('calc-waste').value;
     const diet = document.getElementById('calc-diet').value;
 
-    const computedTotal = calculateCarbonEquivalentMetric(trans, electric, water, waste, diet);
+    const computedTotal = calculateCarbon(trans, electric, water, waste, diet);
     document.getElementById('live-calc-total').innerText = computedTotal.toFixed(2);
 
     // Re-render intelligent analytics insight blocks dynamically based on input metrics
@@ -206,9 +206,9 @@ function calculateFootprintEvent(e) {
     const waste = parseFloat(document.getElementById('calc-waste').value) || 0;
     const diet = document.getElementById('calc-diet').value;
 
-    const computedTotal = calculateCarbonEquivalentMetric(trans, electric, water, waste, diet);
+    const computedTotal = calculateCarbon(trans, electric, water, waste, diet);
 
-    processDailyStreakValidationMetrics();
+    updateStreak();
 
     const newLogEntry = {
         id: "log-" + Date.now(),
@@ -226,18 +226,18 @@ function calculateFootprintEvent(e) {
     state.points += 25; // Award eco points
     
     saveStateToLocalStorage();
-    refreshApplicationInterfaceMetricsUI();
+    refreshUI();
     resetCalculatorForm();
     showToastNotification("Eco footprint metrics computed and added to activity logs successfully! (+25 XP)", "success");
 }
 
 function resetCalculatorForm() {
     document.getElementById('calc-form').reset();
-    runLiveRealTimeCalculatorEnginePreview();
+    updateLivePreview();
 }
 
 // STREAK VALIDATION SUB SYSTEM MECHANICS INTERFACE TRACKER
-function processDailyStreakValidationMetrics() {
+function updateStreak() {
     const todayStr = getCurrentDateString();
     if (state.lastLoggedDateStr !== todayStr) {
         if (state.lastLoggedDateStr === getOffsetDateString(1)) {
@@ -361,7 +361,7 @@ function renderAchievementsGrid() {
 }
 
 // TELEMETRY VISUALIZATION CHARTS GENERATION ENGINE VIA CHART JS WRAPPERS
-function renderChartsTelemetry() {
+function renderCharts() {
     const isDark = document.documentElement.classList.contains('dark');
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
     const textColor = isDark ? '#94a3b8' : '#64748b';
@@ -494,8 +494,8 @@ function renderLogsTable() {
                 <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">${l.diet}</span></td>
                 <td class="p-4 font-bold text-rose-500">${l.carbon.toFixed(2)}</td>
                 <td class="p-4 text-center whitespace-nowrap space-x-1">
-                    <button onclick="openEditManualLogModal('${l.id}')" class="px-2 py-1 text-blue-500 hover:bg-blue-500/10 rounded transition-all" title="Edit entry"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button onclick="deleteLogEntryTransaction('${l.id}')" class="px-2 py-1 text-rose-500 hover:bg-rose-500/10 rounded transition-all" title="Delete entry"><i class="fa-solid fa-trash-can"></i></button>
+                    <button onclick="openEditModal('${l.id}')" class="px-2 py-1 text-blue-500 hover:bg-blue-500/10 rounded transition-all" title="Edit entry"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button onclick="deleteLogEntry('${l.id}')" class="px-2 py-1 text-rose-500 hover:bg-rose-500/10 rounded transition-all" title="Delete entry"><i class="fa-solid fa-trash-can"></i></button>
                 </td>
             </tr>
         `;
@@ -503,14 +503,14 @@ function renderLogsTable() {
 }
 
 // CRUD ENTRIES MODAL CONTAINER HOOK FUNCTIONS
-function openAddManualLogModal() {
+function openAddModal() {
     document.getElementById('modal-log-form').reset();
     document.getElementById('modal-edit-id').value = "";
     document.getElementById('modal-title-context').innerText = "Insert Historical Environmental Track Entry";
     document.getElementById('manual-log-modal').classList.remove('hidden');
 }
 
-function openEditManualLogModal(id) {
+function openEditModal(id) {
     const entry = state.logs.find(l => l.id === id);
     if (!entry) return;
 
@@ -526,11 +526,11 @@ function openEditManualLogModal(id) {
     document.getElementById('manual-log-modal').classList.remove('hidden');
 }
 
-function closeAddManualLogModal() {
+function closeAddModal() {
     document.getElementById('manual-log-modal').classList.add('hidden');
 }
 
-function handleManualLogFormSubmit(e) {
+function handleManualLogSubmit(e) {
     e.preventDefault();
     const editId = document.getElementById('modal-edit-id').value;
     const desc = document.getElementById('modal-log-desc').value;
@@ -540,7 +540,7 @@ function handleManualLogFormSubmit(e) {
     const waste = parseFloat(document.getElementById('modal-log-waste').value) || 0;
     const diet = document.getElementById('modal-log-diet').value;
 
-    const carbon = calculateCarbonEquivalentMetric(trans, electric, water, waste, diet);
+    const carbon = calculateCarbon(trans, electric, water, waste, diet);
 
     if (editId) {
         const logIndex = state.logs.findIndex(l => l.id === editId);
@@ -549,7 +549,7 @@ function handleManualLogFormSubmit(e) {
             showToastNotification("Historical environmental telemetry item log transaction updated successfully!", "success");
         }
     } else {
-        processDailyStreakValidationMetrics();
+        updateStreak();
         const newEntry = {
             id: "log-" + Date.now(),
             date: getCurrentDateString(),
@@ -561,15 +561,15 @@ function handleManualLogFormSubmit(e) {
     }
 
     saveStateToLocalStorage();
-    refreshApplicationInterfaceMetricsUI();
-    closeAddManualLogModal();
+    refreshUI();
+    closeAddModal();
 }
 
-function deleteLogEntryTransaction(id) {
+function deleteLogEntry(id) {
     if (confirm("Are you absolutely sure you want to permanently purge this sustainability log record?")) {
         state.logs = state.logs.filter(l => l.id !== id);
         saveStateToLocalStorage();
-        refreshApplicationInterfaceMetricsUI();
+        refreshUI();
         showToastNotification("Selected transaction data purged from platform logs records.", "info");
     }
 }
@@ -581,7 +581,7 @@ function handleChatSubmit(e) {
     const messageText = inputField.value.trim();
     if (!messageText) return;
 
-    appendChatBubbleElement(messageText, true);
+    appendChatBubble(messageText, true);
     inputField.value = "";
 
     const indicator = document.getElementById('ai-typing-indicator');
@@ -589,8 +589,8 @@ function handleChatSubmit(e) {
 
     setTimeout(() => {
         indicator.classList.add('hidden');
-        const aiResponseText = generateContextualMockAIResponseString(messageText);
-        appendChatBubbleElement(aiResponseText, false);
+        const aiResponseText = getMockAIResponse(messageText);
+        appendChatBubble(aiResponseText, false);
         state.points += 5; 
         updateGamificationDisplays();
     }, 850);
@@ -602,7 +602,7 @@ function sendQuickChatPrompt(promptText) {
     handleChatSubmit(dummyEvent);
 }
 
-function appendChatBubbleElement(text, isUser = false) {
+function appendChatBubble(text, isUser = false) {
     const container = document.getElementById('chat-messages-container');
     const alignmentClass = isUser ? "justify-end ml-auto" : "justify-start";
     const bgClass = isUser ? "bg-eco-600 text-white rounded-br-none" : "bg-white dark:bg-slate-800 rounded-tl-none border border-slate-100 dark:border-slate-800/80";
@@ -623,7 +623,7 @@ function appendChatBubbleElement(text, isUser = false) {
     container.scrollTop = container.scrollHeight;
 }
 
-function generateContextualMockAIResponseString(msg) {
+function getMockAIResponse(msg) {
     const lowerMsg = msg.toLowerCase();
     if (lowerMsg.includes('energy') || lowerMsg.includes('power') || lowerMsg.includes('electricity')) {
         return `<strong>Household Energy Optimization Matrix Guidelines:</strong><br><br>1. Replace legacy lighting with Energy-Star rated LED units to trim power burden by up to 75%.<br>2. Enable eco saving protocols across idle home electronics networks.<br>3. Review your telemetry metric widgets daily to identify abnormal usage spikes.`;
@@ -669,7 +669,7 @@ function removeVisionImage() {
     document.getElementById('vision-results-box').classList.add('hidden');
 }
 
-function runMockVisionAnalysis() {
+function runVisionAnalysis() {
     const fileInput = document.getElementById('vision-file-input');
     if (fileInput.files.length === 0) {
         showToastNotification("Error context constraint: Upload or drag an image asset file before processing analysis.", "error");
@@ -710,11 +710,12 @@ function saveProfileSettingsEvent(e) {
     state.profile.goal = document.getElementById('profile-goal').value;
 
     saveStateToLocalStorage();
-    refreshApplicationInterfaceMetricsUI();
+    refreshUI();
     showToastNotification("User identity settings preferences saved locally.", "success");
 }
 
-function clearAllDataWipeReset() {
+// FULL RESET DATA PIPELINE
+function wipeAllData() {
     if (confirm("CRITICAL WARNING: This completely wipes all historical tracking logs, point totals, levels, and local profile configurations permanently. Proceed?")) {
         localStorage.clear();
         state.profile = { name: "Eco Guardian", ageGroup: "adult-young", location: "Global Citizen", goal: "net-zero", theme: "light" };
@@ -724,7 +725,7 @@ function clearAllDataWipeReset() {
         state.lastLoggedDateStr = "";
         
         applyThemeDefaults();
-        refreshApplicationInterfaceMetricsUI();
+        refreshUI();
         showToastNotification("Local storage tracking nodes database cleared cleanly. System reset complete.", "info");
     }
 }
